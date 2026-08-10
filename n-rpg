@@ -1,0 +1,501 @@
+-- ===== by nln Scripts =====
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NLNSplash"
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local Frame = Instance.new("Frame")
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+Frame.Size = UDim2.new(0, 280, 0, 70)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.BackgroundTransparency = 1
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Parent = Frame
+Stroke.Color = Color3.fromRGB(170, 0, 255)
+Stroke.Thickness = 2
+Stroke.Transparency = 1
+
+local Text = Instance.new("TextLabel")
+Text.Parent = Frame
+Text.Size = UDim2.fromScale(1, 1)
+Text.BackgroundTransparency = 1
+Text.Text = "by nln"
+Text.Font = Enum.Font.GothamBold
+Text.TextScaled = true
+Text.TextColor3 = Color3.fromRGB(170, 0, 255)
+Text.TextTransparency = 1
+
+TweenService:Create(Frame, TweenInfo.new(0.35), {BackgroundTransparency = 0.2}):Play()
+TweenService:Create(Stroke, TweenInfo.new(0.35), {Transparency = 0}):Play()
+TweenService:Create(Text, TweenInfo.new(0.35), {TextTransparency = 0}):Play()
+
+task.wait(2)
+
+TweenService:Create(Frame, TweenInfo.new(0.35), {BackgroundTransparency = 1}):Play()
+TweenService:Create(Stroke, TweenInfo.new(0.35), {Transparency = 1}):Play()
+TweenService:Create(Text, TweenInfo.new(0.35), {TextTransparency = 1}):Play()
+
+task.wait(0.4)
+ScreenGui:Destroy()
+
+task.wait(0.1)
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local LocalPlayer = Players.LocalPlayer
+
+local Settings = {
+    AutoPerk = false,
+    UnderFly = false,
+    AutoFight = false,
+    Height = 3,
+    FightInterval = 0.08,
+}
+
+local Character
+local Humanoid
+local RootPart
+
+local function refreshCharacter()
+    Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    Humanoid = Character:WaitForChild("Humanoid")
+    RootPart = Character:WaitForChild("HumanoidRootPart")
+end
+
+refreshCharacter()
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.25)
+    refreshCharacter()
+end)
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NlnPanel"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.fromOffset(300, 310)
+Main.Position = UDim2.new(0.5, -150, 0.5, -155)
+Main.BackgroundColor3 = Color3.fromRGB(8, 8, 10)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(145, 45, 255)
+MainStroke.Thickness = 2
+MainStroke.Parent = Main
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 8)
+MainCorner.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Size = UDim2.new(1, -20, 0, 35)
+Title.Position = UDim2.fromOffset(10, 5)
+Title.BackgroundTransparency = 1
+Title.Text = "by nln"
+Title.TextColor3 = Color3.fromRGB(220, 220, 230)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Main
+
+local function createButton(name, text, y)
+    local Button = Instance.new("TextButton")
+    Button.Name = name
+    Button.Size = UDim2.new(1, -30, 0, 42)
+    Button.Position = UDim2.fromOffset(15, y)
+    Button.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+    Button.BorderSizePixel = 0
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(235, 235, 240)
+    Button.Font = Enum.Font.GothamSemibold
+    Button.TextSize = 14
+    Button.AutoButtonColor = false
+    Button.Parent = Main
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(75, 30, 105)
+    Stroke.Thickness = 1
+    Stroke.Parent = Button
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = Button
+
+    return Button
+end
+
+local AutoPerkButton = createButton("AutoPerk", "Auto Perk: OFF", 50)
+local UnderFlyButton = createButton("UnderFly", "Under Fly: OFF", 100)
+local AutoFightButton = createButton("AutoFight", "Auto Fight: OFF", 150)
+
+local HeightLabel = Instance.new("TextLabel")
+HeightLabel.Name = "HeightLabel"
+HeightLabel.Size = UDim2.new(1, -30, 0, 25)
+HeightLabel.Position = UDim2.fromOffset(15, 205)
+HeightLabel.BackgroundTransparency = 1
+HeightLabel.Text = "Height: 3"
+HeightLabel.TextColor3 = Color3.fromRGB(210, 210, 220)
+HeightLabel.Font = Enum.Font.Gotham
+HeightLabel.TextSize = 13
+HeightLabel.TextXAlignment = Enum.TextXAlignment.Left
+HeightLabel.Parent = Main
+
+local Slider = Instance.new("TextButton")
+Slider.Name = "HeightSlider"
+Slider.Size = UDim2.new(1, -30, 0, 12)
+Slider.Position = UDim2.fromOffset(15, 235)
+Slider.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+Slider.BorderSizePixel = 0
+Slider.Text = ""
+Slider.AutoButtonColor = false
+Slider.Parent = Main
+
+local SliderCorner = Instance.new("UICorner")
+SliderCorner.CornerRadius = UDim.new(1, 0)
+SliderCorner.Parent = Slider
+
+local Fill = Instance.new("Frame")
+Fill.Name = "Fill"
+Fill.Size = UDim2.new(0.3, 0, 1, 0)
+Fill.BackgroundColor3 = Color3.fromRGB(145, 45, 255)
+Fill.BorderSizePixel = 0
+Fill.Parent = Slider
+
+local FillCorner = Instance.new("UICorner")
+FillCorner.CornerRadius = UDim.new(1, 0)
+FillCorner.Parent = Fill
+
+local MinLabel = Instance.new("TextLabel")
+MinLabel.Size = UDim2.fromOffset(50, 20)
+MinLabel.Position = UDim2.fromOffset(15, 250)
+MinLabel.BackgroundTransparency = 1
+MinLabel.Text = "0"
+MinLabel.TextColor3 = Color3.fromRGB(130, 130, 140)
+MinLabel.Font = Enum.Font.Gotham
+MinLabel.TextSize = 11
+MinLabel.TextXAlignment = Enum.TextXAlignment.Left
+MinLabel.Parent = Main
+
+local MaxLabel = Instance.new("TextLabel")
+MaxLabel.Size = UDim2.fromOffset(50, 20)
+MaxLabel.Position = UDim2.new(1, -65, 0, 250)
+MaxLabel.BackgroundTransparency = 1
+MaxLabel.Text = "10"
+MaxLabel.TextColor3 = Color3.fromRGB(130, 130, 140)
+MaxLabel.Font = Enum.Font.Gotham
+MaxLabel.TextSize = 11
+MaxLabel.TextXAlignment = Enum.TextXAlignment.Right
+MaxLabel.Parent = Main
+
+local Collapse = Instance.new("TextButton")
+Collapse.Name = "Collapse"
+Collapse.Size = UDim2.fromOffset(120, 30)
+Collapse.Position = UDim2.new(0.5, -60, 1, 8)
+Collapse.BackgroundColor3 = Color3.fromRGB(8, 8, 10)
+Collapse.BorderSizePixel = 0
+Collapse.Text = "Collapse"
+Collapse.TextColor3 = Color3.fromRGB(235, 235, 240)
+Collapse.Font = Enum.Font.GothamBold
+Collapse.TextSize = 12
+Collapse.AutoButtonColor = false
+Collapse.Parent = Main
+
+local CollapseStroke = Instance.new("UIStroke")
+CollapseStroke.Color = Color3.fromRGB(145, 45, 255)
+CollapseStroke.Thickness = 2
+CollapseStroke.Parent = Collapse
+
+local CollapseCorner = Instance.new("UICorner")
+CollapseCorner.CornerRadius = UDim.new(0, 6)
+CollapseCorner.Parent = Collapse
+
+-- Dragging
+local dragging = false
+local dragStart
+local startPosition
+
+Title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPosition = Main.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(
+            startPosition.X.Scale,
+            startPosition.X.Offset + delta.X,
+            startPosition.Y.Scale,
+            startPosition.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- Toggle visual state
+local function updateButton(button, label, enabled)
+    button.Text = label .. ": " .. (enabled and "ON" or "OFF")
+    if enabled then
+        button.BackgroundColor3 = Color3.fromRGB(45, 20, 65)
+    else
+        button.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+    end
+end
+
+AutoPerkButton.MouseButton1Click:Connect(function()
+    Settings.AutoPerk = not Settings.AutoPerk
+    updateButton(AutoPerkButton, "Auto Perk", Settings.AutoPerk)
+end)
+
+UnderFlyButton.MouseButton1Click:Connect(function()
+    Settings.UnderFly = not Settings.UnderFly
+    updateButton(UnderFlyButton, "Under Fly", Settings.UnderFly)
+
+    if not Settings.UnderFly and Humanoid then
+        Humanoid.PlatformStand = false
+    end
+end)
+
+AutoFightButton.MouseButton1Click:Connect(function()
+    Settings.AutoFight = not Settings.AutoFight
+    updateButton(AutoFightButton, "Auto Fight", Settings.AutoFight)
+end)
+
+-- Height slider
+local function setHeightFromX(x)
+    local left = Slider.AbsolutePosition.X
+    local width = Slider.AbsoluteSize.X
+    local alpha = math.clamp((x - left) / width, 0, 1)
+
+    Settings.Height = math.floor(alpha * 100 + 0.5) / 10
+    Fill.Size = UDim2.new(alpha, 0, 1, 0)
+    HeightLabel.Text = "Height: " .. string.format("%.1f", Settings.Height)
+end
+
+Slider.MouseButton1Down:Connect(function(x)
+    setHeightFromX(x)
+
+    local connection
+    connection = UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            setHeightFromX(input.Position.X)
+        end
+    end)
+
+    local ended
+    ended = UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            connection:Disconnect()
+            ended:Disconnect()
+        end
+    end)
+end)
+
+-- Collapse / expand
+local collapsed = false
+local savedSize = Main.Size
+
+Collapse.MouseButton1Click:Connect(function()
+    collapsed = not collapsed
+
+    if collapsed then
+        savedSize = Main.Size
+        Main.Size = UDim2.fromOffset(300, 45)
+        AutoPerkButton.Visible = false
+        UnderFlyButton.Visible = false
+        AutoFightButton.Visible = false
+        HeightLabel.Visible = false
+        Slider.Visible = false
+        MinLabel.Visible = false
+        MaxLabel.Visible = false
+        Collapse.Text = "Expand"
+    else
+        Main.Size = savedSize
+        AutoPerkButton.Visible = true
+        UnderFlyButton.Visible = true
+        AutoFightButton.Visible = true
+        HeightLabel.Visible = true
+        Slider.Visible = true
+        MinLabel.Visible = true
+        MaxLabel.Visible = true
+        Collapse.Text = "Collapse"
+    end
+end)
+
+-- Auto Perk: Q, E, R, G
+local perkKeys = {
+    Enum.KeyCode.Q,
+    Enum.KeyCode.E,
+    Enum.KeyCode.R,
+    Enum.KeyCode.G,
+}
+
+local function pressKey(keyCode)
+    VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+    task.wait(0.03)
+    VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+end
+
+task.spawn(function()
+    while ScreenGui.Parent do
+        if Settings.AutoPerk then
+            for _, keyCode in ipairs(perkKeys) do
+                if not Settings.AutoPerk then
+                    break
+                end
+                pressKey(keyCode)
+                task.wait(0.05)
+            end
+        else
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- NPC detection
+local function getNPCs()
+    local result = {}
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj ~= Character then
+            local npcHumanoid = obj:FindFirstChildOfClass("Humanoid")
+            local npcRoot = obj:FindFirstChild("HumanoidRootPart")
+                or obj:FindFirstChild("UpperTorso")
+                or obj:FindFirstChild("Torso")
+
+            if npcHumanoid and npcRoot and npcHumanoid.Health > 0 then
+                local isPlayerCharacter = Players:GetPlayerFromCharacter(obj) ~= nil
+
+                if not isPlayerCharacter then
+                    table.insert(result, {
+                        Model = obj,
+                        Humanoid = npcHumanoid,
+                        Root = npcRoot,
+                    })
+                end
+            end
+        end
+    end
+
+    return result
+end
+
+local currentTarget = nil
+
+local function chooseRandomNPC()
+    local npcs = getNPCs()
+
+    if #npcs == 0 then
+        return nil
+    end
+
+    return npcs[math.random(1, #npcs)]
+end
+
+local function validTarget(target)
+    return target
+        and target.Model
+        and target.Model.Parent
+        and target.Humanoid
+        and target.Humanoid.Parent
+        and target.Root
+        and target.Root.Parent
+        and target.Humanoid.Health > 0
+end
+
+-- Under Fly
+RunService.Heartbeat:Connect(function()
+    if not Settings.UnderFly then
+        return
+    end
+
+    if not Character or not Character.Parent or not RootPart or not RootPart.Parent then
+        refreshCharacter()
+        return
+    end
+
+    if not validTarget(currentTarget) then
+        currentTarget = chooseRandomNPC()
+    end
+
+    if validTarget(currentTarget) then
+        local targetRoot = currentTarget.Root
+
+        -- Keeps the player's torso below the NPC torso.
+        -- Increase Height to move farther downward.
+        local targetPosition = targetRoot.Position - Vector3.new(
+            0,
+            math.max(0, Settings.Height),
+            0
+        )
+
+        RootPart.CFrame = CFrame.new(targetPosition, targetRoot.Position)
+
+        if Humanoid then
+            Humanoid.PlatformStand = true
+        end
+    end
+end)
+
+-- Auto Fight
+task.spawn(function()
+    while ScreenGui.Parent do
+        if Settings.AutoFight then
+            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+            task.wait(Settings.FightInterval)
+        else
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- Num 1 toggles Auto Fight
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then
+        return
+    end
+
+    if input.KeyCode == Enum.KeyCode.KeypadOne then
+        Settings.AutoFight = not Settings.AutoFight
+        updateButton(AutoFightButton, "Auto Fight", Settings.AutoFight)
+    end
+end)
+
+-- Retarget immediately after an NPC dies.
+workspace.DescendantRemoving:Connect(function(instance)
+    if currentTarget and instance == currentTarget.Model then
+        currentTarget = nil
+    end
+end)
